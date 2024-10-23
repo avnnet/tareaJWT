@@ -99,6 +99,11 @@ class HelloWorldController {
 
     @PostMapping("/registerusuario")
     public ResponseEntity<String> registerUser(@RequestBody Usuario usuario) {
+
+       /*  if (userNewRepository.existsByEmail(usuarioRepository.getEmail())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
+        } */
+
         // Asocia los teléfonos con el usuario antes de guardar
         for (Telefono telefono : usuario.getTelefonos()) {
             telefono.setUsuario(usuario);
