@@ -150,6 +150,6 @@ public class UserNew {
 
     public void setIsActive(boolean b) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setIsActive'");
+        //throw new UnsupportedOperationException("Unimplemented method 'setIsActive'");
     }
 }

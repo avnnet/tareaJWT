@@ -101,30 +101,46 @@ class HelloWorldController {
     @PostMapping("/registerusuario")
     public ResponseEntity<String> registerUser(@RequestBody Usuario usuario) {
 
-       /*  if (userNewRepository.existsByEmail(usuarioRepository.getEmail())) {
+         if (userNewRepository.existsByEmail(usuario.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
-        } */
+        } 
+
+        if (!emailIsValid(usuario.getEmail())) {
+            return ResponseEntity.badRequest().body("El correo tiene un formato incorrecto.");
+        }
+
+        // Verificar que el formato de la contraseña sea válido
+        if (!passwordIsValid(usuario.getPassword())) {
+            return ResponseEntity.badRequest().body("La contraseña no cumple con los requisitos.");
+        }
 
         // Asocia los teléfonos con el usuario antes de guardar
         for (Telefono telefono : usuario.getTelefonos()) {
             telefono.setUsuario(usuario);
         }
+        try {
+
+            usuarioRepository.save(usuario);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
+        }
+
 
         // Guardamos el usuario junto con los teléfonos en la BD
-        usuarioRepository.save(usuario);
+        //usuarioRepository.save(usuario);
 
         return ResponseEntity.ok("Usuario registrado exitosamente");
 
 	// Crear la respuesta con los datos requeridos
-	/* RegisterResponseDto response = new RegisterResponseDto();
-	response.setId(1); //"newUser.getId()");
+	// RegisterResponseDto response = new RegisterResponseDto();
+	/*response.setId(1); //"newUser.getId()");
 	response.setCreated(newUser.getCreated());
 	response.setModified(newUser.getModified());
 	response.setLastLogin(newUser.getLastLogin());
 	response.setToken(token);
-	response.setIsActive(newUser.getIsActive());
+	response.setIsActive(newUser.getIsActive()); */
 
-	return ResponseEntity.ok(response); */
+	//return ResponseEntity.ok(response); 
 
     }
     public boolean emailIsValid(String email) {
@@ -135,7 +151,7 @@ class HelloWorldController {
     }
 	// Este es
 
-	 @PostMapping("/registerusernew")    
+	@PostMapping("/registerusernew")    
 
 	public ResponseEntity<?> registerUser(@RequestBody RegisterUserNewDto registerUserNewDto) {
     // Verificar que el email sea válido
@@ -156,6 +172,7 @@ class HelloWorldController {
     // Crear un nuevo usuario y guardar en la base de datos
     UserNew newUser = new UserNew();
     newUser.setNombre(registerUserNewDto.getName());
+    newUser.setNombre(registerUserNewDto.getName());
     newUser.setEmail(registerUserNewDto.getEmail());
     newUser.setPassword(encodePassword(registerUserNewDto.getPassword())); // Hashear la contraseña
     newUser.setCreated(LocalDateTime.now());
@@ -165,6 +182,7 @@ class HelloWorldController {
 
 
     try {
+
         userNewRepository.save(newUser);
     } catch (Exception e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
@@ -187,15 +205,16 @@ class HelloWorldController {
     String token = generateToken(newUser);
 
     // Crear la respuesta con los datos requeridos
-    RegisterResponseDto response = new RegisterResponseDto();
-  /*   response.setId(newUser.getId());
+   /* RegisterResponseDto response = new RegisterResponseDto();
+     response.setId(newUser.getId());
     response.setCreated(newUser.getCreated());
     response.setModified(newUser.getModified());
     response.setLastLogin(newUser.getLastLogin());
     response.setToken(token);
     response.setIsActive(newUser.getIsActive()); */
 
-    return ResponseEntity.ok(response);
+    //return ResponseEntity.ok(response);
+    return ResponseEntity.ok(newUser);
    }
  
 
@@ -207,12 +226,14 @@ class HelloWorldController {
 
     private String encodePassword(String password) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'encodePassword'");
+        //throw new UnsupportedOperationException("Unimplemented method 'encodePassword'");
+        return password;
     }
 
     private boolean passwordIsValid(String password) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'passwordIsValid'");
+        //throw new UnsupportedOperationException("Unimplemented method 'passwordIsValid'");
+        return true;
     }
 
     /* private boolean emailIsValid(String email) {
