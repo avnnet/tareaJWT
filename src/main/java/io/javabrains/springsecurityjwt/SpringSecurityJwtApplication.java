@@ -12,6 +12,7 @@ import io.javabrains.springsecurityjwt.models.TaskRepository;
 import io.javabrains.springsecurityjwt.models.Telefono;
 import io.javabrains.springsecurityjwt.models.User;
 import io.javabrains.springsecurityjwt.models.UserNew;
+import io.javabrains.springsecurityjwt.models.UserNewRepository;
 import io.javabrains.springsecurityjwt.models.UserRepository;
 import io.javabrains.springsecurityjwt.models.Usuario;
 import io.javabrains.springsecurityjwt.models.UsuarioRepository;
@@ -80,8 +81,14 @@ class HelloWorldController {
 	@Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserNewRepository userNewRepository;
+
+    @Autowired
+    private PhoneRepository phoneRepository;
+
 	@PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserNew user) {
+    public ResponseEntity<String> registerUser(@RequestBody User user) {
         // Aquí guardamos el usuario en la base de datos
         userRepository.save(user);
         return ResponseEntity.ok("Usuario registrado exitosamente");
@@ -117,7 +124,7 @@ class HelloWorldController {
 
 	// Este es
 
-	@PostMapping("/registerusernew")
+	 @PostMapping("/registerusernew")    
 
 	public ResponseEntity<?> registerUser(@RequestBody RegisterUserNewDto registerUserNewDto) {
     // Verificar que el email sea válido
@@ -131,7 +138,7 @@ class HelloWorldController {
     }
 
     // Verificar si el correo ya está registrado
-    if (userRepository.existsByEmail(registerUserNewDto.getEmail())) {
+    if (userNewRepository.existsByEmail(registerUserNewDto.getEmail())) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
     }
 
@@ -145,7 +152,14 @@ class HelloWorldController {
     newUser.setLastLogin(LocalDateTime.now());
     newUser.setIsActive(true);
 
-    userRepository.save(newUser);
+
+    try {
+        userNewRepository.save(newUser);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
+    }
+
+   // userNewRepository.save(newUser);
 
     // Guardar teléfonos en la base de datos
     for (PhoneNewDto phoneDto : registerUserNewDto.getPhones()) {
@@ -154,8 +168,8 @@ class HelloWorldController {
         phone.setCitycode(phoneDto.getCitycode());
         phone.setContrycode(phoneDto.getContrycode());
         phone.setUser(newUser); // Relacionar con el usuario
-        PhoneRepository phoneRepository;
-        // phoneRepository.save(phone);
+        //PhoneRepository phoneRepository;
+         phoneRepository.save(phone);
     }
 
     // Generar un token (JWT o UUID)
@@ -171,8 +185,8 @@ class HelloWorldController {
     response.setIsActive(newUser.getIsActive()); */
 
     return ResponseEntity.ok(response);
-}
-
+   }
+ 
 
 
 	private String generateToken(User newUser) {

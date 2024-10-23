@@ -36,10 +36,21 @@ public class UserNew {
     @Column(name = "token")
     private String token;
 
+    @Column(name = "username")
+    private String username;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PhoneNewDto> phones;
 
     // Getters y setters
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
     public Long getId() {
         return id;
