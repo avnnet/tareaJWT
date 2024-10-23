@@ -21,6 +21,7 @@ import io.javabrains.springsecurityjwt.util.JwtUtil;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -126,7 +127,12 @@ class HelloWorldController {
 	return ResponseEntity.ok(response); */
 
     }
-
+    public boolean emailIsValid(String email) {
+        // Regular expression for validating an email
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return email != null && pattern.matcher(email).matches();
+    }
 	// Este es
 
 	 @PostMapping("/registerusernew")    
@@ -209,10 +215,10 @@ class HelloWorldController {
         throw new UnsupportedOperationException("Unimplemented method 'passwordIsValid'");
     }
 
-    private boolean emailIsValid(String email) {
+    /* private boolean emailIsValid(String email) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'emailIsValid'");
-    }
+        //throw new UnsupportedOperationException("Unimplemented method 'emailIsValid'");
+    } */
 
     private String generateToken(UserNew newUser) {
         // TODO Auto-generated method stub
