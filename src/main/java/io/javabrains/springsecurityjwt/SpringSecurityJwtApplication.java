@@ -16,6 +16,7 @@ import io.javabrains.springsecurityjwt.models.UserNewRepository;
 import io.javabrains.springsecurityjwt.models.UserRepository;
 import io.javabrains.springsecurityjwt.models.Usuario;
 import io.javabrains.springsecurityjwt.models.UsuarioRepository;
+import io.javabrains.springsecurityjwt.models.UsuarioRepository2;
 import io.javabrains.springsecurityjwt.util.JwtUtil;
 
 import java.time.LocalDateTime;
@@ -98,8 +99,12 @@ class HelloWorldController {
 	@Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private UsuarioRepository2 usuarioRepository2;
+
+
     @PostMapping("/registerusuario")
-    public ResponseEntity<String> registerUser(@RequestBody Usuario usuario) {
+    public ResponseEntity<?> registerUser(@RequestBody Usuario usuario) {
 
          if (userNewRepository.existsByEmail(usuario.getEmail())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
@@ -129,20 +134,103 @@ class HelloWorldController {
         // Guardamos el usuario junto con los teléfonos en la BD
         //usuarioRepository.save(usuario);
 
-        return ResponseEntity.ok("Usuario registrado exitosamente");
+       // return ResponseEntity.ok("Usuario registrado exitosamente");
 
 	// Crear la respuesta con los datos requeridos
-	// RegisterResponseDto response = new RegisterResponseDto();
-	/*response.setId(1); //"newUser.getId()");
-	response.setCreated(newUser.getCreated());
+	/* RegisterResponseDto response = new RegisterResponseDto();
+	 response.setId(1); //"newUser.getId()");
+	response.setCreated(LocalDateTime.now());
 	response.setModified(newUser.getModified());
 	response.setLastLogin(newUser.getLastLogin());
 	response.setToken(token);
 	response.setIsActive(newUser.getIsActive()); */
 
+    // Generar el token JWT
+    //final UserDetails userDetails = ((UserDetailsService) getUserDetails()).loadUserByUsername(usuario.getNombre());
+    //final String jwt = jwtTokenUtil.generateToken(userDetails);
+
+    UserNew newUser = new UserNew();
+    //newUser.setNombre(registerUserNewDto.getName());
+    //newUser.setNombre(registerUserNewDto.getName());
+    //newUser.setEmail(registerUserNewDto.getEmail());
+    //newUser.setPassword(encodePassword(registerUserNewDto.getPassword())); // Hashear la contraseña
+    newUser.setCreated(LocalDateTime.now());
+    newUser.setModified(LocalDateTime.now());
+    newUser.setLastLogin(LocalDateTime.now());
+    //newUser.setToken(jwt);
+    newUser.setIsActive(true);
+
+    return ResponseEntity.ok(newUser); 
+
 	//return ResponseEntity.ok(response); 
 
     }
+
+    // register2
+    @PostMapping("/registerusuario2")
+public ResponseEntity<?> registerUser2(@RequestBody Usuario usuario) {
+    // Verificar si el correo ya está registrado
+    if (userNewRepository.existsByEmail(usuario.getEmail())) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body("El correo ya registrado.");
+    }
+
+    // Verificar que el formato del correo sea válido
+    if (!emailIsValid(usuario.getEmail())) {
+        return ResponseEntity.badRequest().body("El correo tiene un formato incorrecto.");
+    }
+
+    // Verificar que el formato de la contraseña sea válido
+    if (!passwordIsValid(usuario.getPassword())) {
+        return ResponseEntity.badRequest().body("La contraseña no cumple con los requisitos.");
+    }
+
+    // Asocia los teléfonos con el usuario antes de guardar
+    for (Telefono telefono : usuario.getTelefonos()) {
+        telefono.setUsuario(usuario);
+    }
+
+    // Crear el nuevo usuario
+    UserNew newUser = new UserNew();
+    //newUser.setId(UUID.randomUUID()); // Generar UUID para el usuario
+    newUser.setNombre(usuario.getNombre());
+    newUser.setEmail(usuario.getEmail());
+    newUser.setPassword(encodePassword(usuario.getPassword())); // Hashear la contraseña
+    newUser.setCreated(LocalDateTime.now());
+    newUser.setModified(LocalDateTime.now());
+    newUser.setLastLogin(LocalDateTime.now());
+    newUser.setIsActive(true);
+
+    // Generar token JWT o UUID
+    String token = JwtTokenUtils.generateToken(usuario.getEmail());
+    newUser.setToken(token); // Persistir el token junto con el usuario
+
+    // Guardar el usuario en la base de datos
+    try {
+        usuarioRepository2.save(newUser);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al guardar el usuario.");
+    }
+
+    // Crear la respuesta con los datos requeridos
+    RegisterResponseDto response = new RegisterResponseDto();
+    response.setId(newUser.getId());
+    response.setToken(newUser.getToken());
+    response.setModified(newUser.getModified());
+    response.setIsActive(true);
+    response.setCreated(newUser.getCreated());
+
+    response.setLastLogin(newUser.getLastLogin());
+
+   /* 
+    
+    response.setLastLogin(newUser.getLastLogin());
+    
+     */
+
+    return ResponseEntity.status(HttpStatus.CREATED).body(response); // Retornar código 201 para creación exitosa
+}
+    // fin register2
+
     public boolean emailIsValid(String email) {
         // Regular expression for validating an email
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";

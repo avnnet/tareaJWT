@@ -11,9 +11,13 @@ public class RegisterResponseDto {
     private LocalDateTime lastLogin;
     private String token;
     private boolean isActive;
-    public void setId(int i) {
+
+
+    
+    public void setId(Long i) {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setId'");
+        //throw new UnsupportedOperationException("Unimplemented method 'setId'");
+        this.id = i;
     }
     public Long getId() {
         return id;
@@ -32,6 +36,23 @@ public class RegisterResponseDto {
     }
     public boolean isActive() {
         return isActive;
+    }
+    public void setToken(String token2) {
+        this.token = token2;
+    }
+    public void setModified(LocalDateTime modified2) {       
+       this.modified = modified2;
+    }
+    public void setIsActive(boolean b) {
+        // TODO Auto-generated method stub
+       this.isActive = b;
+    }
+    public void setCreated(LocalDateTime created2) {
+        // TODO Auto-generated method stub
+        this.created = created2;
+    }
+    public void setLastLogin(LocalDateTime lastLogin2) {
+       this.lastLogin = lastLogin2;
     }
 
     // Getters y setters
