@@ -148,20 +148,31 @@ class HelloWorldController {
     // Generar el token JWT
     //final UserDetails userDetails = ((UserDetailsService) getUserDetails()).loadUserByUsername(usuario.getNombre());
     //final String jwt = jwtTokenUtil.generateToken(userDetails);
+    try {
+        UserNew newUser = new UserNew();
 
-    UserNew newUser = new UserNew();
-    //newUser.setNombre(registerUserNewDto.getName());
-    //newUser.setNombre(registerUserNewDto.getName());
-    //newUser.setEmail(registerUserNewDto.getEmail());
-    //newUser.setPassword(encodePassword(registerUserNewDto.getPassword())); // Hashear la contraseña
-    newUser.setCreated(LocalDateTime.now());
-    newUser.setModified(LocalDateTime.now());
-    newUser.setLastLogin(LocalDateTime.now());
-    //newUser.setToken(jwt);
-    newUser.setIsActive(true);
+        newUser.setId(usuario.getId());
+        newUser.setNombre(usuario.getNombre());
+        newUser.setEmail(usuario.getEmail());
+        newUser.setPassword(encodePassword(usuario.getPassword())); // Hashear la contraseña
 
-    return ResponseEntity.ok(newUser); 
+        newUser.setCreated(LocalDateTime.now());
+        newUser.setModified(LocalDateTime.now());
+        newUser.setLastLogin(LocalDateTime.now());
+        // newUser.setToken(jwt);
+        newUser.setIsActive(true);
 
+         
+
+        // Generar token JWT o UUID
+        String token = JwtTokenUtils.generateToken(usuario.getEmail());
+        newUser.setToken(token); // Persistir el token junto con el usuario
+
+        return ResponseEntity.ok(newUser);
+    } catch (Exception e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body("Ocurrió un error al registrar el usuario.");
+    }
 	//return ResponseEntity.ok(response); 
 
     }
@@ -200,6 +211,10 @@ public ResponseEntity<?> registerUser2(@RequestBody Usuario usuario) {
     newUser.setLastLogin(LocalDateTime.now());
     newUser.setIsActive(true);
 
+
+
+
+
     // Generar token JWT o UUID
     String token = JwtTokenUtils.generateToken(usuario.getEmail());
     newUser.setToken(token); // Persistir el token junto con el usuario
@@ -221,6 +236,9 @@ public ResponseEntity<?> registerUser2(@RequestBody Usuario usuario) {
 
     response.setLastLogin(newUser.getLastLogin());
 
+
+
+    
    /* 
     
     response.setLastLogin(newUser.getLastLogin());

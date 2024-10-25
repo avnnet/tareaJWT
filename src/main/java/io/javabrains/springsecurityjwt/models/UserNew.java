@@ -40,7 +40,12 @@ public class UserNew {
     private String username;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    
     private List<PhoneNewDto> phones;
+
+       // Relación OneToMany con la entidad Telefono
+       @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+       private List<Telefono> telefonos;
 
     // Getters y setters
 
@@ -151,5 +156,13 @@ public class UserNew {
     public void setIsActive(boolean b) {
         // TODO Auto-generated method stub
         //throw new UnsupportedOperationException("Unimplemented method 'setIsActive'");
+    }
+
+    public List<Telefono> getTelefonos() {
+        return telefonos;
+    }
+
+    public void setTelefonos(List<Telefono> telefonos) {
+        this.telefonos = telefonos;
     }
 }
